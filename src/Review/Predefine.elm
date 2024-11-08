@@ -43,6 +43,7 @@ elm-review --template lue-bird/elm-review-predefine/example
 rule : Review.Rule.Rule
 rule =
     Review.Rule.newProjectRuleSchema "Review.Predefine" initialContext
+        |> Review.Rule.withContextFromImportedModules
         |> Review.Rule.withDirectDependenciesProjectVisitor
             (\directDependencies context ->
                 ( []
@@ -144,11 +145,13 @@ rule =
                             )
                         )
             )
+        |> Review.Rule.withContextFromImportedModules
         |> Review.Rule.withModuleContextUsingContextCreator
             { foldProjectContexts = projectContextsMerge
             , fromProjectToModule = projectToModuleContext
             , fromModuleToProject = moduleToProjectContext
             }
+        |> Review.Rule.withContextFromImportedModules
         |> Review.Rule.fromProjectRuleSchema
 
 

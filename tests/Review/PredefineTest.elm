@@ -136,6 +136,22 @@ listMap f list =
                     |> Review.Test.run Review.Predefine.rule
                     |> Review.Test.expectNoErrors
             )
+        , Test.test "should not report an error when module-declared function with signature is fully applied but the last argument (applied with |>) uses argument from let-in in application"
+            (\() ->
+                """module A exposing (..)
+a b =
+    let bAgain = b
+    in
+    identity bAgain
+        |> listMap identity
+
+listMap : (a -> b) -> List a -> List b
+listMap f list =
+    List.map f list
+"""
+                    |> Review.Test.run Review.Predefine.rule
+                    |> Review.Test.expectNoErrors
+            )
         , Test.test "should not report an error when imported function from project without signature is fully applied but last argument uses argument"
             (\() ->
                 [ """module A exposing (..)

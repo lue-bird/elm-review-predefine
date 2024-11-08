@@ -378,7 +378,7 @@ expressionEnterVisitor expressionNode context =
                                         maybeFullArgumentCount =
                                             case call.referenceRange |> Review.ModuleNameLookupTable.moduleNameAt context.moduleOriginLookup of
                                                 Nothing ->
-                                                    Nothing
+                                                    Debug.todo "moduleNameAt Nothing"
 
                                                 Just [] ->
                                                     context.moduleFunctionDeclarationArgumentCounts
@@ -392,7 +392,7 @@ expressionEnterVisitor expressionNode context =
                                     in
                                     case maybeFullArgumentCount of
                                         Nothing ->
-                                            True
+                                            Debug.todo "maybeFullArgumentCount Nothing"
 
                                         Just fullArgumentCount ->
                                             call.argumentCount >= fullArgumentCount

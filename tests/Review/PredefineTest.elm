@@ -84,6 +84,58 @@ listMap f list =
                     |> Review.Test.run Review.Predefine.rule
                     |> Review.Test.expectNoErrors
             )
+        , Test.test "should not report an error when module-declared function with signature is fully applied but the last argument uses an argument from last case-of branch"
+            (\() ->
+                """module A exposing (..)
+a b =
+    case b of
+        [] ->
+            []
+        list ->
+            listMap identity list
+
+listMap : (a -> b) -> List a -> List b
+listMap f list =
+    List.map f list
+"""
+                    |> Review.Test.run Review.Predefine.rule
+                    |> Review.Test.expectNoErrors
+            )
+        , Test.test "should not report an error when module-declared function with signature is fully applied but the last argument uses arguments from first case-of branch in application"
+            (\() ->
+                """module A exposing (..)
+a b =
+    case b of
+        bHead::bTail ->
+            listMap identity (identity (bHead::bTail))
+        [] ->
+            []
+
+listMap : (a -> b) -> List a -> List b
+listMap f list =
+    List.map f list
+"""
+                    |> Review.Test.run Review.Predefine.rule
+                    |> Review.Test.expectNoErrors
+            )
+        , Test.test "should not report an error when module-declared function with signature is fully applied but the last argument (applied with |>) uses arguments from first case-of branch in application"
+            (\() ->
+                """module A exposing (..)
+a b =
+    case b of
+        bHead::bTail ->
+            identity (bHead::bTail)
+                |> listMap identity
+        [] ->
+            []
+
+listMap : (a -> b) -> List a -> List b
+listMap f list =
+    List.map f list
+"""
+                    |> Review.Test.run Review.Predefine.rule
+                    |> Review.Test.expectNoErrors
+            )
         , Test.test "should not report an error when imported function from project without signature is fully applied but last argument uses argument"
             (\() ->
                 [ """module A exposing (..)

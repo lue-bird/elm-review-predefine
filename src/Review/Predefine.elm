@@ -298,6 +298,17 @@ declarationsFunctionArgumentCounts declarations =
                                     |> FastDict.insert (implementation.name |> Elm.Syntax.Node.value)
                                         argumentCountAtLeast1
 
+                    Elm.Syntax.Declaration.CustomTypeDeclaration choiceType ->
+                        choiceType.constructors
+                            |> List.foldl
+                                (\(Elm.Syntax.Node.Node _ variant) soFarInVariants ->
+                                    soFarInVariants
+                                        |> FastDict.insert
+                                            (variant.name |> Elm.Syntax.Node.value)
+                                            (variant.arguments |> List.length)
+                                )
+                                soFar
+
                     _ ->
                         soFar
             )

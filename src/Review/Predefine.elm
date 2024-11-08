@@ -513,6 +513,18 @@ expressionToCall (Elm.Syntax.Node.Node fullRange expression) =
                         , argumentCount = appliedCall.argumentCount + 1
                         }
 
+        Elm.Syntax.Expression.ParenthesizedExpression inParens ->
+            case inParens |> expressionToCall of
+                Nothing ->
+                    Nothing
+
+                Just appliedCall ->
+                    Just
+                        { referenceRange = appliedCall.referenceRange
+                        , unqualifiedName = appliedCall.unqualifiedName
+                        , argumentCount = appliedCall.argumentCount
+                        }
+
         _ ->
             Nothing
 

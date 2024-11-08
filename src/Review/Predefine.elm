@@ -42,8 +42,8 @@ elm-review --template lue-bird/elm-review-predefine/example
 -}
 rule : Review.Rule.Rule
 rule =
-    Review.Rule.newProjectRuleSchema "Review.Predefine" initialContext
-        |> Review.Rule.withContextFromImportedModules
+    Review.Rule.newProjectRuleSchema "Review.Predefine"
+        initialContext
         |> Review.Rule.withDirectDependenciesProjectVisitor
             (\directDependencies context ->
                 ( []
@@ -63,7 +63,6 @@ rule =
                   }
                 )
             )
-        |> Review.Rule.withContextFromImportedModules
         |> Review.Rule.withModuleVisitor
             (\moduleVisitor ->
                 moduleVisitor
@@ -151,7 +150,6 @@ rule =
             , fromProjectToModule = projectToModuleContext
             , fromModuleToProject = moduleToProjectContext
             }
-        |> Review.Rule.withContextFromImportedModules
         |> Review.Rule.fromProjectRuleSchema
 
 
@@ -210,7 +208,7 @@ moduleToProjectContext =
     Review.Rule.initContextCreator
         (\moduleName moduleContext ->
             { functionDeclarationArgumentCounts =
-                FastDict.singleton moduleName
+                FastDict.singleton (moduleName |> Debug.log "added to functionDeclarationArgumentCounts")
                     moduleContext.moduleFunctionDeclarationArgumentCounts
             }
         )

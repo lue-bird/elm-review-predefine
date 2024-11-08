@@ -394,7 +394,7 @@ expressionEnterVisitor expressionNode context =
                                                                 ("context.importedFunctionDeclarationArgumentCounts did not have "
                                                                     ++ Debug.toString (moduleNamePart0 :: moduleNamePart1Up)
                                                                     ++ " "
-                                                                    ++ Debug.toString (context.importedFunctionDeclarationArgumentCounts |> FastDict.toList)
+                                                                    ++ Debug.toString (context.importedFunctionDeclarationArgumentCounts |> FastDict.keys)
                                                                 )
 
                                                         Just moduleFunctionDeclarationArgumentCounts ->
@@ -406,7 +406,7 @@ expressionEnterVisitor expressionNode context =
                                                                             ++ "."
                                                                             ++ call.unqualifiedName
                                                                             ++ " "
-                                                                            ++ Debug.toString (moduleFunctionDeclarationArgumentCounts |> FastDict.toList)
+                                                                            ++ Debug.toString (moduleFunctionDeclarationArgumentCounts |> FastDict.keys)
                                                                         )
 
                                                                 Just argumentCount ->

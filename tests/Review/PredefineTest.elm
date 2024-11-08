@@ -71,6 +71,67 @@ map f list =
                     |> Review.Test.runOnModules Review.Predefine.rule
                     |> Review.Test.expectNoErrors
             )
+        , Test.test "should not report an error when module-declared function with signature is fully applied but the last argument uses an argument"
+            (\() ->
+                """module A exposing (..)
+a b =
+    listMap identity b
+
+listMap : (a -> b) -> List a -> List b
+listMap f list =
+    List.map f list
+"""
+                    |> Review.Test.run Review.Predefine.rule
+                    |> Review.Test.expectNoErrors
+            )
+        , Test.test "should not report an error when imported function from project without signature is fully applied but last argument uses argument"
+            (\() ->
+                [ """module A exposing (..)
+import List2
+a b =
+    List2.map identity
+"""
+                , """module List2 exposing (map)
+
+map f list =
+    List.map f list
+"""
+                ]
+                    |> Review.Test.runOnModules Review.Predefine.rule
+                    |> Review.Test.expectNoErrors
+            )
+        , Test.test "should not report an error when imported function from project without signature is fully applied but last argument uses argument in application"
+            (\() ->
+                [ """module A exposing (..)
+import List2
+a b =
+    List2.map identity (identity b)
+"""
+                , """module List2 exposing (map)
+
+map f list =
+    List.map f list
+"""
+                ]
+                    |> Review.Test.runOnModules Review.Predefine.rule
+                    |> Review.Test.expectNoErrors
+            )
+        , Test.test "should not report an error when imported function from project without signature is fully applied but last argument (applied with |>) uses argument in application"
+            (\() ->
+                [ """module A exposing (..)
+import List2
+a b =
+    identity b |> List2.map identity
+"""
+                , """module List2 exposing (map)
+
+map f list =
+    List.map f list
+"""
+                ]
+                    |> Review.Test.runOnModules Review.Predefine.rule
+                    |> Review.Test.expectNoErrors
+            )
         , Test.test "should report an error when function is fully applied"
             (\() ->
                 """module A exposing (..)

@@ -29,6 +29,32 @@ listMap f list =
                     |> Review.Test.run Review.Predefine.rule
                     |> Review.Test.expectNoErrors
             )
+        , Test.test "should not report an error when module-declared function with signature is curried"
+            (\() ->
+                """module A exposing (..)
+a b =
+    listMap identity
+
+listMap : (a -> b) -> List a -> List b
+listMap f list =
+    List.map f list
+"""
+                    |> Review.Test.run Review.Predefine.rule
+                    |> Review.Test.expectNoErrors
+            )
+        , Test.test "should not report an error when module-declared function with signature where out type function is parenthesized is curried"
+            (\() ->
+                """module A exposing (..)
+a b =
+    listMap identity
+
+listMap : (a -> b) -> (List a -> List b)
+listMap f list =
+    List.map f list
+"""
+                    |> Review.Test.run Review.Predefine.rule
+                    |> Review.Test.expectNoErrors
+            )
         , Test.test "should not report an error when imported function from project without signature is curried"
             (\() ->
                 [ """module A exposing (..)
@@ -87,6 +113,81 @@ a b =
                             { message = "value can be pre-defined"
                             , details = [ "Since this value doesn't rely on any arguments, it can be moved to the module level, which comes with a performance benefit." ]
                             , under = "List.map identity <| []"
+                            }
+                        ]
+            )
+        , Test.test "should report an error when function is fully applied multiple times via |>"
+            (\() ->
+                """module A exposing (..)
+a b =
+    [] |> identity |> identity
+"""
+                    |> Review.Test.run Review.Predefine.rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = "value can be pre-defined"
+                            , details = [ "Since this value doesn't rely on any arguments, it can be moved to the module level, which comes with a performance benefit." ]
+                            , under = "[] |> identity |> identity"
+                            }
+                        ]
+            )
+        , Test.test "should report an error when function is fully applied multiple times via <|"
+            (\() ->
+                """module A exposing (..)
+a b =
+    identity <| identity <| []
+"""
+                    |> Review.Test.run Review.Predefine.rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = "value can be pre-defined"
+                            , details = [ "Since this value doesn't rely on any arguments, it can be moved to the module level, which comes with a performance benefit." ]
+                            , under = "identity <| identity <| []"
+                            }
+                        ]
+            )
+        , Test.test "should report an error when function is fully applied via <| into parenthesized <|"
+            (\() ->
+                """module A exposing (..)
+a b =
+    (List.map <| identity) <| []
+"""
+                    |> Review.Test.run Review.Predefine.rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = "value can be pre-defined"
+                            , details = [ "Since this value doesn't rely on any arguments, it can be moved to the module level, which comes with a performance benefit." ]
+                            , under = "(List.map <| identity) <| []"
+                            }
+                        ]
+            )
+        , Test.test "should report an error when function is fully applied via <| into parenthesized |>"
+            (\() ->
+                """module A exposing (..)
+a b =
+    (identity |> List.map) <| []
+"""
+                    |> Review.Test.run Review.Predefine.rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = "value can be pre-defined"
+                            , details = [ "Since this value doesn't rely on any arguments, it can be moved to the module level, which comes with a performance benefit." ]
+                            , under = "(identity |> List.map) <| []"
+                            }
+                        ]
+            )
+        , Test.test "should report an error when function is fully applied via <| into parenthesized application"
+            (\() ->
+                """module A exposing (..)
+a b =
+    (List.map identity) <| []
+"""
+                    |> Review.Test.run Review.Predefine.rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = "value can be pre-defined"
+                            , details = [ "Since this value doesn't rely on any arguments, it can be moved to the module level, which comes with a performance benefit." ]
+                            , under = "(List.map identity) <| []"
                             }
                         ]
             )

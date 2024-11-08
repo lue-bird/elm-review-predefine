@@ -442,19 +442,14 @@ expressionUsedVariables expression =
             _ ->
                 FastSet.empty
         )
-        (case expression |> expressionSubs of
-            [] ->
+        ((expression |> expressionSubs)
+            |> List.foldl
+                (\(Elm.Syntax.Node.Node _ sub) soFar ->
+                    FastSet.union
+                        (sub |> expressionUsedVariables)
+                        soFar
+                )
                 FastSet.empty
-
-            sub0 :: sub1Up ->
-                (sub0 :: sub1Up)
-                    |> List.foldl
-                        (\(Elm.Syntax.Node.Node _ sub) soFar ->
-                            FastSet.union
-                                (sub |> expressionUsedVariables)
-                                soFar
-                        )
-                        FastSet.empty
         )
 
 

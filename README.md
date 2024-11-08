@@ -3,7 +3,7 @@
 The [`elm-review`](https://package.elm-lang.org/packages/jfmengels/elm-review/latest/) rule `Review.Predefine` which reports values that are constructed lazily but could be defined at the module level to save allocations.
 
 ```bash
-elm-review --template lue-bird/elm-review-predefine/example
+elm-review --template lue-bird/elm-review-predefine/preview
 ```
 
 **I will never release this** because it inherently has lots of false positives, makes your code ugly and is rarely applicable in the first place. However, feel free to use the template for a quick manual review or adapt with more restrictions for when it reports.

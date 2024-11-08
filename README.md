@@ -10,7 +10,7 @@ elm-review --template lue-bird/elm-review-predefine/preview
 
 Keep in mind:
 
-  - certain things like functions (e.g. `Result.andThen identity`) are _perfectly fine_ to construct again and again on the fly. Since this rule neither has type information nor does any analysis, it will report stuff like that. Ignore it in that case!
+  - certain things like partially applied functions (e.g. `Result.andThen identity`) are _perfectly fine_ to construct again and again on the fly. Since this rule neither has type information nor does any analysis, it will report stuff like that. Ignore it in that case!
   - if you use a function with arguments _exclusively in fully applied style_ and not lazily there's no issue either. This rule makes no effort to check for cases like that. Ignore it in that case!
   - the rule only operates on expression-level and therefore does not detect or suggest moving let value/function declarations
   - I did not write tests for this because it's a semi-throwaway rule and works fine for my purpose. But feel free to add some or report bugs

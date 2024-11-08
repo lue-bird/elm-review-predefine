@@ -385,14 +385,36 @@ expressionEnterVisitor expressionNode context =
                                                         |> FastDict.get call.unqualifiedName
 
                                                 Just (moduleNamePart0 :: moduleNamePart1Up) ->
-                                                    context.importedFunctionDeclarationArgumentCounts
-                                                        |> FastDict.get (moduleNamePart0 :: moduleNamePart1Up)
-                                                        |> Maybe.andThen
-                                                            (FastDict.get call.unqualifiedName)
+                                                    case
+                                                        context.importedFunctionDeclarationArgumentCounts
+                                                            |> FastDict.get (moduleNamePart0 :: moduleNamePart1Up)
+                                                    of
+                                                        Nothing ->
+                                                            Debug.todo
+                                                                ("context.importedFunctionDeclarationArgumentCounts did not have "
+                                                                    ++ Debug.toString (moduleNamePart0 :: moduleNamePart1Up)
+                                                                    ++ " "
+                                                                    ++ Debug.toString (context.importedFunctionDeclarationArgumentCounts |> FastDict.toList)
+                                                                )
+
+                                                        Just moduleFunctionDeclarationArgumentCounts ->
+                                                            case moduleFunctionDeclarationArgumentCounts |> FastDict.get call.unqualifiedName of
+                                                                Nothing ->
+                                                                    Debug.todo
+                                                                        ("context.importedFunctionDeclarationArgumentCounts did not have "
+                                                                            ++ Debug.toString (moduleNamePart0 :: moduleNamePart1Up)
+                                                                            ++ "."
+                                                                            ++ call.unqualifiedName
+                                                                            ++ " "
+                                                                            ++ Debug.toString (moduleFunctionDeclarationArgumentCounts |> FastDict.toList)
+                                                                        )
+
+                                                                Just argumentCount ->
+                                                                    Just argumentCount
                                     in
                                     case maybeFullArgumentCount of
                                         Nothing ->
-                                            Debug.todo "maybeFullArgumentCount Nothing"
+                                            True
 
                                         Just fullArgumentCount ->
                                             call.argumentCount >= fullArgumentCount

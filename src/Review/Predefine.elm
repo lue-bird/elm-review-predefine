@@ -208,7 +208,7 @@ moduleToProjectContext =
     Review.Rule.initContextCreator
         (\moduleName moduleContext ->
             { functionDeclarationArgumentCounts =
-                FastDict.singleton (moduleName |> Debug.log "added to functionDeclarationArgumentCounts")
+                FastDict.singleton moduleName
                     moduleContext.moduleFunctionDeclarationArgumentCounts
             }
         )
@@ -379,39 +379,16 @@ expressionEnterVisitor expressionNode context =
                                         maybeFullArgumentCount =
                                             case call.referenceRange |> Review.ModuleNameLookupTable.moduleNameAt context.moduleOriginLookup of
                                                 Nothing ->
-                                                    Debug.todo "moduleNameAt Nothing"
+                                                    Nothing
 
                                                 Just [] ->
                                                     context.moduleFunctionDeclarationArgumentCounts
                                                         |> FastDict.get call.unqualifiedName
 
                                                 Just (moduleNamePart0 :: moduleNamePart1Up) ->
-                                                    case
-                                                        context.importedFunctionDeclarationArgumentCounts
-                                                            |> FastDict.get (moduleNamePart0 :: moduleNamePart1Up)
-                                                    of
-                                                        Nothing ->
-                                                            Debug.todo
-                                                                ("context.importedFunctionDeclarationArgumentCounts did not have "
-                                                                    ++ Debug.toString (moduleNamePart0 :: moduleNamePart1Up)
-                                                                    ++ " "
-                                                                    ++ Debug.toString (context.importedFunctionDeclarationArgumentCounts |> FastDict.keys)
-                                                                )
-
-                                                        Just moduleFunctionDeclarationArgumentCounts ->
-                                                            case moduleFunctionDeclarationArgumentCounts |> FastDict.get call.unqualifiedName of
-                                                                Nothing ->
-                                                                    Debug.todo
-                                                                        ("context.importedFunctionDeclarationArgumentCounts did not have "
-                                                                            ++ Debug.toString (moduleNamePart0 :: moduleNamePart1Up)
-                                                                            ++ "."
-                                                                            ++ call.unqualifiedName
-                                                                            ++ " "
-                                                                            ++ Debug.toString (moduleFunctionDeclarationArgumentCounts |> FastDict.keys)
-                                                                        )
-
-                                                                Just argumentCount ->
-                                                                    Just argumentCount
+                                                    context.importedFunctionDeclarationArgumentCounts
+                                                        |> FastDict.get (moduleNamePart0 :: moduleNamePart1Up)
+                                                        |> Maybe.andThen (FastDict.get call.unqualifiedName)
                                     in
                                     case maybeFullArgumentCount of
                                         Nothing ->
